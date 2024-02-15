@@ -1,13 +1,17 @@
 import { createStore } from 'vuex'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URLS
-const updateLocalStorageCart = (cart)=> {localStorage.setItem('cart', JSON.stringify(cart))}
-const updateLocalStorageCreditCard = (creditCard)=> {localStorage.setItem('creditCard', JSON.stringify(creditCard))}
+const updateLocalStorageCart = (cart) => {
+  localStorage.setItem('cart', JSON.stringify(cart))
+}
+const updateLocalStorageCreditCard = (creditCard) => {
+  localStorage.setItem('creditCard', JSON.stringify(creditCard))
+}
 
 export default createStore({
   state: {
     products: [],
     cart: {},
-    creditCardData:{}
+    creditCardData: {}
   },
   mutations: {
     setProducts(state, payload) {
@@ -17,12 +21,13 @@ export default createStore({
       state.cart[payload.id] = payload
       updateLocalStorageCart(state.cart)
     },
-    setCreditCardData(state,payload){
+    setCreditCardData(state, payload) {
       state.creditCardData = payload
+      updateLocalStorageCreditCard(payload)
     },
     setCartInfo(state, payload) {
       state.cart = payload
-      updateLocalStorageCreditCard(payload)
+      updateLocalStorageCart(payload)
     },
     setEmptyCart(state) {
       state.cart = {}
@@ -45,11 +50,17 @@ export default createStore({
 
       commit('setToCart', product)
     },
-    setCartValueFromLocalStorage({ commit }){
-        const localStorageCart =  localStorage.getItem('cart')
-        if(localStorageCart){
-            commit('setCartInfo', JSON.parse(localStorageCart))
-          }
+    setCartValueFromLocalStorage({ commit }) {
+      const localStorageCart = localStorage.getItem('cart')
+      if (localStorageCart) {
+        commit('setCartInfo', JSON.parse(localStorageCart))
+      }
+    },
+    setCreditCardFromLocalStorage({ commit }) {
+      const localStorageCard = localStorage.getItem('creditCard')
+      if (localStorageCard) {
+        commit('setCreditCardData', JSON.parse(localStorageCard))
+      }
     }
   },
   getters: {

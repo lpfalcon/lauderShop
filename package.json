@@ -12,9 +12,11 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "bootstrap": "^5.3.2",
     "vue": "^3.4.15",
     "vue-credit-card-validation": "^1.0.5",
     "vue-router": "^4.2.5",
+    "vue-sweetalert2": "^5.0.5",
     "vuex": "^4.0.2"
   },
   "devDependencies": {

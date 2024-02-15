@@ -34,7 +34,6 @@ async function fetchProducts() {
 // mounted 
 onMounted(async () => {
   await fetchProducts()
-  await store.dispatch('setCartValueFromLocalStorage')
 })
 // add products to card
 function addToCart(product) {

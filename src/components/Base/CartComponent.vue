@@ -5,14 +5,59 @@ export default defineComponent({
 })
 </script>
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted, inject } from 'vue'
 import { useStore } from 'vuex'
+import { Modal } from 'bootstrap'
+
 const store = useStore()
 const cart = computed(() => store.state.cart)
+const totalAmount = computed(() => store.getters.totalAmount)
+const form = computed(() => store.state.creditCardData)
+const summaryModal = ref(null)
+const formModal = ref(null)
+let summaryModalComponent = null
+let formModalComponent = null
+const swal = inject('$swal')
+
+onMounted(async () => {
+  summaryModalComponent = new Modal(summaryModal.value)
+  formModalComponent = new Modal(formModal.value)
+  await store.dispatch('setCartValueFromLocalStorage')
+  await store.dispatch('setCreditCardFromLocalStorage')
+})
+
 const emptyCard = () => {
   store.commit('setEmptyCart')
 }
-const totalAmount = computed(() => store.getters.totalAmount)
+
+function closeSummaryModal() {
+  summaryModalComponent.hide()
+  formModalComponent.hide()
+}
+
+// REMOVE EMPTY ELEMENTS OF AN OBJECT
+function removeEmpty(object) {
+  return Object.fromEntries(Object.entries(object).filter(([_, v]) => !!v))
+}
+
+function submitForm(e) {
+  e.preventDefault()
+  const data = removeEmpty(form.value)
+  if (
+    JSON.stringify(data) === '{}' ||
+    Object.keys(data).length !== Object.keys(form.value).length
+  ) {
+    swal('Campos vacios')
+  } else {
+    store.commit('setCreditCardData', form.value)
+    summaryModalComponent.show()
+    formModalComponent.hide()
+  }
+}
+function payment() {
+    swal('Pago Realizado')
+  closeSummaryModal()
+}
 </script>
 
 <template lang="">
@@ -40,7 +85,9 @@ const totalAmount = computed(() => store.getters.totalAmount)
     <button
       type="button"
       class="btn btn-dark bg-color fw-bold mx-3"
-      data-bs-toggle="modal" href="#exampleModalToggle" role="button"
+        @click=" formModalComponent.show()"
+      role="button"
+      :disabled="JSON.stringify(cart) ==='{}'"
     >
       <i class="bi bi-cart"></i> Pagar
     </button>
@@ -48,21 +95,13 @@ const totalAmount = computed(() => store.getters.totalAmount)
       <i class="bi bi-cart"></i> Vaciar
     </button>
 
-    {{ totalAmount }}
-
     <!-- PAYMENT MODAL COMPONENT -->
 
-    <div
-      class="modal fade"
-      id="exampleModalToggle"
-      aria-hidden="true"
-      aria-labelledby="exampleModalToggleLabel"
-      tabindex="-1"
-    >
+    <div ref="formModal" class="modal fade" id="exampleModalToggle">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalToggleLabel">Modal 1</h5>
+            <h5 class="modal-title" id="exampleModalToggleLabel">Credit Card Info</h5>
             <button
               type="button"
               class="btn-close"
@@ -70,46 +109,49 @@ const totalAmount = computed(() => store.getters.totalAmount)
               aria-label="Close"
             ></button>
           </div>
-          <div class="modal-body">Show a second modal and hide this one with the button below.</div>
-          <div class="modal-footer">
-            <button
-              class="btn btn-primary"
-              data-bs-target="#exampleModalToggle2"
-              data-bs-toggle="modal"
-            >
-              Open second modal
-            </button>
+          <div class="modal-body">
+            <form @submit="submitForm">
+              <div class="form-group">
+                <label>Card number</label>
+                <input class="form-control" v-model="form.number" v-cardformat:formatCardNumber />
+              </div>
+              <div class="form-group">
+                <label>Card Expiry</label>
+                <input class="form-control" v-model="form.cvc" v-cardformat:formatCardExpiry />
+              </div>
+              <div class="form-group">
+                <label>Card CVC</label>
+                <input class="form-control" v-model="form.cardExpiry" v-cardformat:formatCardCVC />
+              </div>
+              <div class="form-group">
+                <label>Numeric input</label>
+                <input
+                  class="form-control"
+                  v-model="form.numericInput"
+                  v-cardformat:restrictNumeric
+                />
+              </div>
+              <button class="btn btn-dark bg-color fw-bold mt-3" id="submit">Submit</button>
+            </form>
           </div>
         </div>
       </div>
     </div>
-    <div
-      class="modal fade"
-      id="exampleModalToggle2"
-      aria-hidden="true"
-      aria-labelledby="exampleModalToggleLabel2"
-      tabindex="-1"
-    >
+    <div ref="summaryModal" class="modal fade">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalToggleLabel2">Modal 2</h5>
+            <h5 class="modal-title" id="exampleModalToggleLabel2">TOTAL AMOUNT</h5>
             <button
               type="button"
               class="btn-close"
-              data-bs-dismiss="modal"
+              @click="closeSummaryModal()"
               aria-label="Close"
             ></button>
           </div>
-          <div class="modal-body">Hide this modal and show the first with the button below.</div>
+          <div class="modal-body">$ {{ totalAmount.toFixed(2) }}</div>
           <div class="modal-footer">
-            <button
-              class="btn btn-primary"
-              data-bs-target="#exampleModalToggle"
-              data-bs-toggle="modal"
-            >
-              Back to first
-            </button>
+            <button class="btn btn-primary" @click="payment">Pay</button>
           </div>
         </div>
       </div>
