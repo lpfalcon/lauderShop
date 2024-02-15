@@ -10,7 +10,7 @@ import ProductComponent from '@/components/Base/ProductComponent.vue'
 import EmptyDataComponent from '@/components/Base/EmptyDataComponent.vue'
 import CartComponent from '@/components/Base/CartComponent.vue'
 
-import { onMounted, computed, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 const store = useStore()
 let isLoading = ref(false)

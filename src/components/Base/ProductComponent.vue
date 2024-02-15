@@ -35,7 +35,7 @@ defineProps({
         class="btn btn-dark bg-color fw-bold"
         @click="$emit('add-to-cart', product)"
       >
-        <i class="bi bi-cart"></i> Comprar
+        <i class="bi bi-cart"></i> Buy
       </button>
     </div>
   </article>

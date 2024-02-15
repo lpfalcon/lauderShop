@@ -47,7 +47,7 @@ function submitForm(e) {
     JSON.stringify(data) === '{}' ||
     Object.keys(data).length !== Object.keys(form.value).length
   ) {
-    swal('Campos vacios')
+    swal('Empty Fields')
   } else {
     store.commit('setCreditCardData', form.value)
     summaryModalComponent.show()
@@ -55,7 +55,7 @@ function submitForm(e) {
   }
 }
 function payment() {
-    swal('Pago Realizado')
+    swal('successful payment')
   closeSummaryModal()
 }
 </script>
@@ -89,10 +89,10 @@ function payment() {
       role="button"
       :disabled="JSON.stringify(cart) ==='{}'"
     >
-      <i class="bi bi-cart"></i> Pagar
+      <i class="bi bi-cart"></i> Pay
     </button>
     <button type="button" class="btn btn-dark bg-color fw-bold" @click="emptyCard()">
-      <i class="bi bi-cart"></i> Vaciar
+      <i class="bi bi-cart"></i> Clear
     </button>
 
     <!-- PAYMENT MODAL COMPONENT -->
